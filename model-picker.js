@@ -206,10 +206,14 @@ function attach(select) {
     if (attached.has(select)) return;
 
     const $select = $(select);
-    // 已经被 select2 接管的下拉：默认不动，除非用户开启接管
+    // 已被 select2 接管的下拉（OpenRouter / Chutes / NanoGPT 等自带搜索的）一并接管，
+    // 全部统一成弹窗选择器，交互一致。
     if ($select.hasClass('select2-hidden-accessible')) {
-        if (!settings.modelPicker.takeoverSelect2) return;
-        $select.select2('destroy');
+        try {
+            $select.select2('destroy');
+        } catch (error) {
+            // select2 尚未加载或已销毁，忽略即可
+        }
     }
 
     const $trigger = $('<div class="stmp_trigger"></div>')
@@ -230,9 +234,19 @@ function attach(select) {
     const onChange = () => updateTrigger(select);
     $select.on('change', onChange);
 
-    // 模型列表是连接 API 后动态填充的，用 MutationObserver 同步显示文本
-    const observer = new MutationObserver(() => updateTrigger(select));
-    observer.observe(select, { childList: true, subtree: true });
+    // 模型列表是连接 API 后动态填充的，用 MutationObserver 同步显示文本。
+    // 顺带盯着 class：核心偶尔会重新把下拉 select2 化（切换 / 重连 API 时），发现就再拆一次。
+    const observer = new MutationObserver(() => {
+        updateTrigger(select);
+        if (select.classList.contains('select2-hidden-accessible')) {
+            try {
+                $(select).select2('destroy');
+            } catch (error) {
+                // 忽略：select2 已销毁
+            }
+        }
+    });
+    observer.observe(select, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
 
     attached.set(select, { trigger: $trigger, onChange, observer });
     updateTrigger(select);

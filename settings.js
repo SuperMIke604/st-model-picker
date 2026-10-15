@@ -7,7 +7,7 @@ const DEFAULT_SETTINGS = {
     modelPicker: {
         enabled: true,
         enableMobile: true,
-        takeoverSelect2: false,
+        /** 不想被接管的下拉 id（select[id^="model_"][id$="_select"]） */
         disabledTargets: [],
     },
     /** 功能二：聊天文件增强 */
@@ -16,23 +16,15 @@ const DEFAULT_SETTINGS = {
         fastOpen: true,
         copyButton: true,
     },
-    /** 功能三：聊天视图优化 + 目录跳转 */
+    /**
+     * 功能三：聊天视图（分页阅读）+ 目录跳转
+     * 只有一种模式：按固定楼数切页，一次只渲染一页，底部常驻翻页条。
+     */
     chatView: {
         enabled: true,
-        /**
-         * 渲染模式：
-         * - paged：分页阅读（起点式）。按固定楼数切页，一次只渲染一页，底部常驻翻页条
-         * - window：只渲染最新 N 楼，向上/向下按段加载（滚动条只有 N 楼长）
-         * - virtual：虚拟化，用上下留白撑出完整滚动条，只挂载视口附近的楼层
-         */
-        mode: 'paged',
-        /** paged 模式下每页多少楼 */
+        /** 每页多少楼 */
         pageSize: 20,
-        /** window 模式下每次加载多少楼；virtual 模式下作为初始装载量 */
-        windowSize: 10,
-        /** DOM 内最多保留多少条消息，超出从另一端裁掉 */
-        maxMessages: 30,
-        /** 收到新消息时自动回到最新窗口 */
+        /** 停在旧页时收到新回复，自动回到最新 */
         autoJumpLatest: true,
     },
 };
@@ -54,7 +46,6 @@ function migrate(raw) {
         modelPicker: {
             enabled: raw.enabled,
             enableMobile: raw.enableMobile,
-            takeoverSelect2: raw.takeoverSelect2,
             disabledTargets: raw.disabledTargets ?? [],
         },
     };
@@ -71,5 +62,11 @@ export const settings = {
 settings.modelPicker.disabledTargets = Array.isArray(settings.modelPicker.disabledTargets)
     ? settings.modelPicker.disabledTargets
     : [];
+
+// 旧版本留下的已废弃字段（多渲染模式 / 是否接管 select2），读到了就丢掉，避免脏数据被回写
+delete settings.modelPicker.takeoverSelect2;
+delete settings.chatView.mode;
+delete settings.chatView.windowSize;
+delete settings.chatView.maxMessages;
 
 extension_settings[MODULE_NAME] = settings;

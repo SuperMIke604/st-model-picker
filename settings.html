@@ -20,10 +20,6 @@
                             <input type="checkbox" id="stmp_enable_mobile" />
                             <span>移动端也启用</span>
                         </label>
-                        <label class="checkbox_label" for="stmp_takeover_select2" title="OpenRouter / Chutes / NanoGPT 等下拉原生已带搜索，默认保持原样">
-                            <input type="checkbox" id="stmp_takeover_select2" />
-                            <span>接管已带搜索的下拉（OpenRouter 等）</span>
-                        </label>
                     </div>
                     <div class="stmp_targets_toolbar">
                         <span class="stmp_subtitle">接管的模型下拉</span>
@@ -66,36 +62,20 @@
                 </div>
                 <div class="inline-drawer-content">
                     <div class="flex-container flexFlowColumn">
-                        <label class="checkbox_label" for="stcv_enabled" title="只渲染视口附近的楼层，并在魔法棒菜单加入「聊天目录」">
+                        <label class="checkbox_label" for="stcv_enabled" title="按固定楼数分页渲染，底部翻页条上带「聊天目录」入口">
                             <input type="checkbox" id="stcv_enabled" />
-                            <span>启用聊天视图优化 + 聊天目录</span>
+                            <span>启用分页阅读 + 聊天目录</span>
                         </label>
-                        <label class="checkbox_label" for="stcv_auto_jump" title="停在旧楼层时收到新回复，自动回到最新">
+                        <label class="checkbox_label" for="stcv_auto_jump" title="停在旧页时收到新回复，自动回到最新一页">
                             <input type="checkbox" id="stcv_auto_jump" />
                             <span>收到新消息自动跳回最新</span>
                         </label>
                     </div>
                     <div class="flex-container alignitemscenter flexGap10 marginTop10">
-                        <label for="stcv_mode">渲染模式</label>
-                        <select id="stcv_mode" class="text_pole" style="width: 240px;">
-                            <option value="paged">分页阅读（一页一页读，底部翻页条）</option>
-                            <option value="virtual">虚拟化（滚动条覆盖全部楼层）</option>
-                            <option value="window">窗口（只渲染最新若干楼）</option>
-                        </select>
-                    </div>
-                    <div class="flex-container alignitemscenter flexGap10 marginTop5">
                         <label for="stcv_page">每页楼层数</label>
                         <input type="number" id="stcv_page" class="text_pole" min="1" max="500" step="1" style="width: 90px;">
                     </div>
-                    <div class="flex-container alignitemscenter flexGap10 marginTop5">
-                        <label for="stcv_window">每次加载楼层数</label>
-                        <input type="number" id="stcv_window" class="text_pole" min="1" max="1000" step="1" style="width: 90px;">
-                    </div>
-                    <div class="flex-container alignitemscenter flexGap10 marginTop5">
-                        <label for="stcv_max">DOM 最多保留消息数</label>
-                        <input type="number" id="stcv_max" class="text_pole" min="10" max="500" step="10" style="width: 90px;">
-                    </div>
-                    <small class="opacity70p">分页阅读：像起点网页版那样按固定楼数切页，一次只渲染一页，底部常驻「上一页 / 页码 / 下一页 / 最新」翻页条，页内正常滚动。跳转永远精确落在目标楼，不存在估算漂移。「每页楼层数」对这种模式生效。<br>虚拟化模式：用上下留白撑出完整滚动条，可直接拖到任意楼层，DOM 只保留视口附近几条；未量过的楼层先用估算高度，进入视口后实测校正。<br>窗口模式：只渲染最新若干楼，下滑续载、向上按段加载，滚动条长度等于当前窗口。「每次加载楼层数」只对窗口模式生效。</small>
+                    <small class="opacity70p">像起点中文网网页版那样按固定楼数切页，一次只渲染一页，页内正常滚动。底部常驻「目录 / 上一页 / 页码 / 下一页 / 最新」翻页条，点「目录」弹出聊天目录（章节 = 用户发言楼层 + 其回复楼层），可搜索后直接跳到该页。<br>跳转是整页替换，永远精确落在目标楼，不存在估算漂移；DOM 里始终只有一页，所以 800 楼和 8000 楼的打开速度、删除速度完全一样。</small>
                 </div>
             </div>
         </div>

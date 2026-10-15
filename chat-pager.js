@@ -28,7 +28,7 @@ import { T, getContext } from './utils.js';
 const PAGER_ID = 'stcv_pager';
 
 const view = () => settings.chatView;
-const isActive = () => view().enabled && view().mode === 'paged';
+const isActive = () => view().enabled;
 
 /** 每页楼数，至少 1 */
 const pageSize = () => Math.max(1, Number(view().pageSize) || 20);
@@ -41,6 +41,23 @@ let currentPage = 0;
 let $bar = null;
 let rendering = false;
 let listenersBound = false;
+
+/**
+ * 「读者是否停在页尾」的标志。
+ * 不能在新消息到达时现算 —— 那时气泡已经追加进 DOM，scrollHeight 变大，
+ * 现算会得到「不在底部」。这里靠 scroll 事件持续维护，新消息到达时读到的就是追加前的状态。
+ */
+let atBottomFlag = true;
+
+function isAtBottom() {
+    const el = chatElement[0];
+    return !el || el.scrollTop + el.clientHeight >= el.scrollHeight - 120;
+}
+
+function scrollToEnd() {
+    const el = chatElement[0];
+    if (el) el.scrollTop = el.scrollHeight;
+}
 
 /* ------------------------------------------------------------------ *
  * 页区间
@@ -91,6 +108,7 @@ async function renderPage(p, { scroll = 'top' } = {}) {
             // 末页就是「最新」，停在底部才符合聊天的阅读习惯，跟点「最新」的落点一致
             const toBottom = scroll === 'bottom' || currentPage >= pageCount() - 1;
             el.scrollTop = toBottom ? el.scrollHeight : 0;
+            atBottomFlag = toBottom;
         }
         updateBar();
     } finally {
@@ -212,8 +230,14 @@ function onNewMessage() {
     if (renderedCount() > pageSize()) {
         // 最后一页正好满了，新消息会开一个新页
         goLatest();
-    } else {
-        updateBar();
+        return;
+    }
+
+    updateBar();
+    // 本来就在页尾看着，新消息追加后把它带进视野
+    // （核心的 scrollChatToBottom 受「自动滚动到底」开关控制，这里自己兜底）
+    if (atBottomFlag) {
+        scrollToEnd();
     }
 }
 
@@ -257,6 +281,9 @@ function bindEvents() {
     const context = getContext();
     const eventTypes = context?.eventTypes ?? {};
     const eventSource = context?.eventSource;
+
+    // 维护「停在页尾」标志，供新消息到达时判断要不要跟到底部
+    chatElement.on('scroll', () => { atBottomFlag = isAtBottom(); });
 
     [eventTypes.MESSAGE_RECEIVED, eventTypes.MESSAGE_SENT].forEach(type => {
         if (type) eventSource?.on(type, onNewMessage);

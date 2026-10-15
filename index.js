@@ -30,7 +30,6 @@ function bindToggles() {
     // 模型选择器
     bind('stmp_enabled', () => settings.modelPicker.enabled, v => settings.modelPicker.enabled = v, applyModelPicker);
     bind('stmp_enable_mobile', () => settings.modelPicker.enableMobile, v => settings.modelPicker.enableMobile = v, applyModelPicker);
-    bind('stmp_takeover_select2', () => settings.modelPicker.takeoverSelect2, v => settings.modelPicker.takeoverSelect2 = v, applyModelPicker);
 
     // 聊天文件增强
     bind('stcfp_enabled', () => settings.chatFiles.enabled, v => settings.chatFiles.enabled = v, applyChatFiles);
@@ -57,20 +56,6 @@ function bindToggles() {
         });
     };
     bindNumber('stcv_page', () => settings.chatView.pageSize, v => settings.chatView.pageSize = v, applyChatView);
-    bindNumber('stcv_window', () => settings.chatView.windowSize, v => settings.chatView.windowSize = v, applyChatView);
-    bindNumber('stcv_max', () => settings.chatView.maxMessages, v => settings.chatView.maxMessages = v, applyChatView);
-
-    // 渲染模式：分页 / 虚拟化 / 窗口
-    const modeSelect = document.getElementById('stcv_mode');
-    if (modeSelect) {
-        const normalize = v => (v === 'window' || v === 'virtual' ? v : 'paged');
-        modeSelect.value = normalize(settings.chatView.mode);
-        modeSelect.addEventListener('change', () => {
-            settings.chatView.mode = normalize(modeSelect.value);
-            context.saveSettingsDebounced();
-            applyChatView();
-        });
-    }
 
     // 目标下拉的全选 / 全不选
     document.getElementById('stmp_targets_all')?.addEventListener('click', () => {
