@@ -17,7 +17,7 @@
  * 会被它们立刻触发，把刚裁掉的旧楼层又灌回来。自有按钮既避免误触发，也让每次加载量可控。
  */
 
-import { chat, chatElement, redisplayChat, updateMessageElement, refreshSwipeButtons, updateEditArrowClasses, printMessages, animation_duration } from '../../../../script.js';
+import { chat, chatElement, redisplayChat, updateMessageElement, refreshSwipeButtons, updateEditArrowClasses, updateViewMessageIds, animation_duration } from '../../../../script.js';
 import { applyStylePins } from '../../../power-user.js';
 import { settings } from './settings.js';
 import { T, getContext } from './utils.js';
@@ -72,15 +72,27 @@ function syncShowMoreButton() {
     }
 }
 
-/** 超过上限时从头部裁掉最老的，保证 DOM 规模恒定 */
-function trimTop() {
-    const max = Math.max(view().windowSize, view().maxMessages);
+/**
+ * 超过上限时从头部裁掉最老的，保证 DOM 规模恒定。
+ * 删除头部会让内容整体上移，这里同步补偿 scrollTop，避免画面跳动。
+ * @param {number} max 保留上限
+ */
+function trimTop(max = Math.max(view().windowSize, view().maxMessages)) {
+    const el = chatElement[0];
+    const prevHeight = el?.scrollHeight ?? 0;
     let count = renderedCount();
+    let trimmed = false;
+
     while (count > max) {
         const first = chatElement.find('.mes').first();
         if (first.length === 0) break;
         first.remove();
         count--;
+        trimmed = true;
+    }
+
+    if (trimmed && el) {
+        el.scrollTop -= (prevHeight - el.scrollHeight);
     }
     syncShowMoreButton();
 }
@@ -104,18 +116,9 @@ function trimBottom() {
  */
 function trimToWindow() {
     if (!view().enabled) return;
-    const max = view().windowSize;
-    let trimmed = false;
-    let count = renderedCount();
-    while (count > max) {
-        const first = chatElement.find('.mes').first();
-        if (first.length === 0) break;
-        first.remove();
-        count--;
-        trimmed = true;
-    }
-    syncShowMoreButton();
-    if (trimmed) {
+    const before = renderedCount();
+    trimTop(view().windowSize);
+    if (renderedCount() !== before) {
         getContext()?.scrollChatToBottom?.();
     }
 }
@@ -125,14 +128,20 @@ function trimToWindow() {
  * ------------------------------------------------------------------ */
 
 /**
- * 渲染以 startId 开头的窗口（长度 = windowSize），并把目标楼滚动到顶部。
+ * 全量重渲染窗口：先清空再按真实 mesid 渲染 [start, start+windowSize)。
+ *
+ * 这是本模块**唯一**的重建入口。核心的 redisplayChat() 依赖「DOM 里存在 startIndex 那条消息」
+ * 作为锚点来删除旧内容；窗口化后 DOM 里往往没有那个锚点，直接调用会把整段又追加一遍，
+ * 造成同一楼层出现两次。所以这里必定先清空。
+ *
  * @param {number} startId 起始消息 id（mesid）
+ * @param {object} [options]
+ * @param {'top'|'bottom'} [options.scroll] 渲染完滚到窗口顶部还是聊天底部
  */
-async function renderWindow(startId) {
+async function renderWindow(startId, { scroll = 'top' } = {}) {
     const start = Math.max(0, Math.min(startId, Math.max(0, chat.length - 1)));
     const end = Math.min(start + view().windowSize, chat.length);
 
-    // 清掉当前窗口（含顶部按钮），redisplayChat 会按真实 mesid 重新渲染
     chatElement.find('.mes').remove();
     chatElement.find('#show_more_messages').remove();
     chatElement.find(`#${SHOW_MORE_ID}`).remove();
@@ -140,14 +149,17 @@ async function renderWindow(startId) {
     await redisplayChat({ targetChat: chat.slice(0, end), startIndex: start, fade: false });
 
     syncShowMoreButton();
-    const target = chatElement.find(`.mes[mesid="${start}"]`)[0];
-    target?.scrollIntoView({ block: 'start' });
+
+    if (scroll === 'bottom') {
+        getContext()?.scrollChatToBottom?.();
+    } else {
+        chatElement.find(`.mes[mesid="${start}"]`)[0]?.scrollIntoView({ block: 'start' });
+    }
 }
 
-/** 回到最新窗口（复用核心 printMessages，它会渲染最后 N 条并滚到底） */
+/** 回到最新窗口并滚到底部 */
 async function jumpToLatest() {
-    await printMessages();
-    trimToWindow();
+    await renderWindow(Math.max(0, chat.length - view().windowSize), { scroll: 'bottom' });
 }
 
 /** 下滑到底时继续加载后续 N 楼，直到最新 */
@@ -170,6 +182,35 @@ async function loadNewer() {
         updateEditArrowClasses();
         applyStylePins();
         trimTop();
+    } finally {
+        loading = false;
+    }
+}
+
+/**
+ * 把窗口尾部补齐到 targetEnd（含）。
+ * 删除楼层后窗口末尾会少一条，用增量追加补回来，比整个窗口重渲染便宜得多。
+ * @param {number} targetEnd 要补到的消息 id
+ */
+async function fillTail(targetEnd) {
+    if (loading) return;
+    const range = currentRange();
+    if (!range) return;
+    const start = range[1] + 1;
+    const end = Math.min(targetEnd + 1, chat.length);
+    if (start >= end) return;
+
+    loading = true;
+    try {
+        const elements = [];
+        for (let i = start; i < end; i++) {
+            elements.push(updateMessageElement(chat[i], { messageId: i })[0]);
+        }
+        chatElement.append(elements);
+        refreshSwipeButtons(false, false);
+        updateEditArrowClasses();
+        applyStylePins();
+        trimTop(view().windowSize);
     } finally {
         loading = false;
     }
@@ -393,16 +434,56 @@ function bindEvents() {
         trimBottom();
     });
 
-    // 收到新消息：自动回到最新窗口
-    const handler = () => {
-        if (!view().enabled || !view().autoJumpLatest) return;
+    // 收到新消息
+    const onNewMessage = () => {
+        if (!view().enabled) return;
         const range = currentRange();
-        if (range && range[1] >= chat.length - 1) return;
-        jumpToLatest();
+        if (!range) return;
+
+        // 停在旧楼层：按设置决定是否跳回最新
+        if (range[1] < chat.length - 1) {
+            if (view().autoJumpLatest) {
+                jumpToLatest();
+            } else {
+                trimTop();
+            }
+            return;
+        }
+
+        // 已经在最新：核心刚把新消息追加好，这里只维持窗口规模，绝不重新渲染
+        // （重渲染会把已有楼层再画一遍，正是「出现两条新输入」的原因）
+        const el = chatElement[0];
+        const atBottom = !el || el.scrollTop + el.clientHeight >= el.scrollHeight - 400;
+        trimTop(atBottom ? view().windowSize : Math.max(view().windowSize, view().maxMessages));
     };
     [eventTypes.MESSAGE_RECEIVED, eventTypes.MESSAGE_SENT].forEach(type => {
-        if (type) eventSource?.on(type, handler);
+        if (type) eventSource?.on(type, onNewMessage);
     });
+
+    // 删除楼层：核心删完会按 DOM 顺序重排 mesid，这里跟着校正一次并收口窗口，
+    // 否则后续按 mesid 的编辑/滑动/续载全部会错位
+    if (eventTypes.MESSAGE_DELETED) {
+        eventSource?.on(eventTypes.MESSAGE_DELETED, () => {
+            if (!view().enabled) return;
+            const range = currentRange();
+            if (!range) {
+                syncShowMoreButton();
+                return;
+            }
+            if (range[1] < chat.length - 1) {
+                // 删掉一条后窗口尾部会缺一条。补一条要完整渲染一个气泡（比删除本身还贵），
+                // 放到下一个事件循环再做，删除操作本身立刻返回，点击手感不拖泥带水。
+                setTimeout(() => fillTail(chat.length - 1), 0);
+                return;
+            }
+            // 窗口大小本来就合规就别动 DOM，省掉一次布局重排
+            if (renderedCount() > view().windowSize) {
+                trimTop(view().windowSize);
+            } else {
+                syncShowMoreButton();
+            }
+        });
+    }
 
     // 切换/打开聊天：核心渲染完后把窗口压到 windowSize
     if (eventTypes.CHAT_CHANGED) {
