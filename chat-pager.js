@@ -106,17 +106,24 @@ function ensureBar() {
     if ($bar && $bar[0]?.isConnected) return $bar;
 
     $bar = $(`<div id="${PAGER_ID}" class="stcv_pager"></div>`);
+    $bar.append($('<div class="stcv_page_btn menu_button" data-act="toc"></div>')
+        .html(`<i class="fa-solid fa-list-ul"></i> ${T('TOC')}`));
     $bar.append($('<div class="stcv_page_btn menu_button" data-act="prev"></div>').text(T('Previous page')));
     $bar.append($('<span class="stcv_page_info"></span>'));
     $bar.append($('<div class="stcv_page_btn menu_button" data-act="next"></div>').text(T('Next page')));
     $bar.append($('<div class="stcv_page_btn menu_button stcv_page_latest" data-act="latest"></div>').text(T('Jump to latest')));
 
-    $bar.on('click', '.stcv_page_btn', function () {
+    $bar.on('click', '.stcv_page_btn', async function () {
         if ($(this).hasClass('stcv_disabled')) return;
         const act = $(this).attr('data-act');
         if (act === 'prev') renderPage(currentPage - 1);
         else if (act === 'next') renderPage(currentPage + 1);
         else if (act === 'latest') goLatest();
+        else if (act === 'toc') {
+            // 目录实现在 chat-toc.js 里，那里静态引入了本模块，这里反过来动态取，避免循环依赖
+            const toc = await import('./chat-toc.js');
+            toc.chatViewApi.openToc();
+        }
     });
 
     // 插到 #chat 之后：放在里面会随聊天内容滚走

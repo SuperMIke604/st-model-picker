@@ -421,7 +421,7 @@ function watchMenu() {
     const menu = document.getElementById('options');
     if (!menu) return;
     menuObserver = new MutationObserver(() => {
-        if (view().enabled && !document.getElementById('option_chat_toc')) {
+        if (view().enabled && view().mode !== 'paged' && !document.getElementById('option_chat_toc')) {
             injectMenuItem();
         }
     });
@@ -541,21 +541,24 @@ export function applyChatView() {
         return;
     }
 
-    injectMenuItem();
-    watchMenu();
     bindEvents();
 
-    if (view().mode === 'virtual') {
-        // 虚拟模式下没有「加载更早」按钮，滚动到顶自然就有更早的楼层
-        chatElement.find(`#${SHOW_MORE_ID}`).remove();
-        teardownPaged();
-        applyChatVirtual();
-    } else if (view().mode === 'paged') {
-        // 分页模式一页一页读，同样不需要「加载更早」
+    if (view().mode === 'paged') {
+        // 分页模式的目录入口在底部翻页条上，魔法棒菜单里不再放
+        removeMenuItem();
         chatElement.find(`#${SHOW_MORE_ID}`).remove();
         teardownVirtual();
         applyChatPaged();
+    } else if (view().mode === 'virtual') {
+        // 虚拟模式下没有「加载更早」按钮，滚动到顶自然就有更早的楼层
+        injectMenuItem();
+        watchMenu();
+        chatElement.find(`#${SHOW_MORE_ID}`).remove();
+        teardownPaged();
+        applyChatVirtual();
     } else {
+        injectMenuItem();
+        watchMenu();
         teardownVirtual();
         teardownPaged();
         syncShowMoreButton();

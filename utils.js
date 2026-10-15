@@ -24,6 +24,7 @@ const EXTRA_ZH = {
     'Next page': '下一页',
     'Page {0} / {1}': '第 {0} / {1} 页',
     'messages': '楼',
+    'TOC': '目录',
 };
 
 /** 获取 SillyTavern 扩展上下文 */
