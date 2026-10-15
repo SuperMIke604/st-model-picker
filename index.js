@@ -10,6 +10,7 @@ import { settings } from './settings.js';
 import { getContext } from './utils.js';
 import { initModelPicker, applyModelPicker, renderTargetList } from './model-picker.js';
 import { initChatFiles, applyChatFiles } from './chat-files.js';
+import { initChatView, applyChatView } from './chat-toc.js';
 
 /** 绑定设置面板里的一组开关 */
 function bindToggles() {
@@ -35,6 +36,28 @@ function bindToggles() {
     bind('stcfp_enabled', () => settings.chatFiles.enabled, v => settings.chatFiles.enabled = v, applyChatFiles);
     bind('stcfp_fast_open', () => settings.chatFiles.fastOpen, v => settings.chatFiles.fastOpen = v, applyChatFiles);
     bind('stcfp_copy_button', () => settings.chatFiles.copyButton, v => settings.chatFiles.copyButton = v, applyChatFiles);
+
+    // 聊天视图与目录
+    bind('stcv_enabled', () => settings.chatView.enabled, v => settings.chatView.enabled = v, applyChatView);
+    bind('stcv_auto_jump', () => settings.chatView.autoJumpLatest, v => settings.chatView.autoJumpLatest = v, applyChatView);
+
+    const bindNumber = (id, get, set, onChanged) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.value = String(get());
+        input.addEventListener('change', () => {
+            const value = Number(input.value);
+            if (!Number.isFinite(value) || value <= 0) {
+                input.value = String(get());
+                return;
+            }
+            set(value);
+            context.saveSettingsDebounced();
+            onChanged();
+        });
+    };
+    bindNumber('stcv_window', () => settings.chatView.windowSize, v => settings.chatView.windowSize = v, applyChatView);
+    bindNumber('stcv_max', () => settings.chatView.maxMessages, v => settings.chatView.maxMessages = v, applyChatView);
 
     // 目标下拉的全选 / 全不选
     document.getElementById('stmp_targets_all')?.addEventListener('click', () => {
@@ -64,6 +87,7 @@ async function loadSettingsUi() {
         await loadSettingsUi();
         initModelPicker();
         initChatFiles();
+        initChatView();
         console.log('[ST Tools] ready');
     } catch (error) {
         console.error('[ST Tools] init failed:', error);

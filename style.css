@@ -268,3 +268,121 @@
         opacity: 1;
     }
 }
+
+/* ---------- 三、聊天视图与目录 ---------- */
+
+/* 顶部「加载更早的消息」：与核心 #show_more_messages 同一观感 */
+#stcv_show_more {
+    text-align: center;
+    margin: 10px auto;
+    font-weight: 500;
+    order: -1;
+    cursor: pointer;
+    padding: 0.5em 1em;
+    background-color: var(--SmartThemeBlurTintColor);
+    width: fit-content;
+    border-radius: 10px;
+    outline: 1px solid var(--SmartThemeBorderColor);
+    transition: filter var(--animation-duration-2x, 0.3s) ease-in-out;
+}
+
+#stcv_show_more:hover {
+    filter: brightness(1.25);
+}
+
+.stcv_popup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.stcv_popup .stcv_title {
+    margin: 0;
+}
+
+.stcv_search_wrap {
+    position: relative;
+}
+
+.stcv_popup .stcv_search_icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.stcv_popup .stcv_search {
+    width: 100%;
+    padding-left: 30px !important;
+    box-sizing: border-box;
+}
+
+.stcv_latest {
+    align-self: flex-start;
+    width: fit-content;
+    white-space: nowrap;
+    padding: 3px 10px;
+}
+
+.stcv_list {
+    overflow-y: auto;
+    max-height: min(55vh, 420px);
+    margin: 0 -4px;
+    padding: 0 4px;
+}
+
+.stcv_item {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.stcv_item:hover {
+    background-color: var(--black30a);
+}
+
+.stcv_item.stcv_active {
+    background-color: var(--black30a);
+    outline: 1px solid var(--SmartThemeBorderColor);
+}
+
+.stcv_label {
+    flex: 0 0 auto;
+    font-family: var(--monoFontFamily, monospace);
+    font-size: 12px;
+    opacity: 0.85;
+    white-space: nowrap;
+}
+
+.stcv_preview {
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stcv_empty {
+    padding: 8px 4px;
+    font-size: 12px;
+    opacity: 0.75;
+    text-align: center;
+}
+
+@media screen and (max-width: 768px) {
+    .stcv_list {
+        max-height: 60vh;
+    }
+
+    .stcv_item {
+        padding: 10px;
+    }
+}

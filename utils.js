@@ -12,6 +12,13 @@ const EXTRA_ZH = {
     'Copying chat file...': '正在复制聊天文件……',
     'Copied to': '已复制为',
     'Copy failed': '复制失败',
+    // 聊天视图与目录
+    'Search chapters...': '搜索章节 / 楼层……',
+    'Jump to latest': '跳到最新',
+    'No matching chapters': '没有匹配的章节',
+    'Chat chapters': '聊天目录',
+    'Load earlier messages': '加载更早的消息',
+    'Close': '关闭',
 };
 
 /** 获取 SillyTavern 扩展上下文 */

@@ -16,6 +16,16 @@ const DEFAULT_SETTINGS = {
         fastOpen: true,
         copyButton: true,
     },
+    /** 功能三：聊天视图窗口化 + 目录跳转 */
+    chatView: {
+        enabled: true,
+        /** 每次加载多少楼（也是打开聊天时渲染的最新楼层数） */
+        windowSize: 10,
+        /** DOM 内最多保留多少条消息，超出从另一端裁掉 */
+        maxMessages: 30,
+        /** 收到新消息时自动回到最新窗口 */
+        autoJumpLatest: true,
+    },
 };
 
 /**
@@ -38,7 +48,6 @@ function migrate(raw) {
             takeoverSelect2: raw.takeoverSelect2,
             disabledTargets: raw.disabledTargets ?? [],
         },
-        chatFiles: { ...DEFAULT_SETTINGS.chatFiles },
     };
 }
 
@@ -47,6 +56,7 @@ const stored = migrate(extension_settings[MODULE_NAME]);
 export const settings = {
     modelPicker: Object.assign({}, DEFAULT_SETTINGS.modelPicker, stored?.modelPicker ?? {}),
     chatFiles: Object.assign({}, DEFAULT_SETTINGS.chatFiles, stored?.chatFiles ?? {}),
+    chatView: Object.assign({}, DEFAULT_SETTINGS.chatView, stored?.chatView ?? {}),
 };
 
 settings.modelPicker.disabledTargets = Array.isArray(settings.modelPicker.disabledTargets)
