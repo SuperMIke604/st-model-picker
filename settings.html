@@ -1,32 +1,63 @@
-<div class="st-model-picker-settings">
+<div class="st-tools-settings">
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
-            <b>Model Picker（模型选择器）</b>
+            <b>ST Tools（酒馆增强套件）</b>
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
-            <div class="flex-container flexFlowColumn">
-                <label class="checkbox_label" for="stmp_enabled" title="关闭后恢复成 SillyTavern 原生下拉">
-                    <input type="checkbox" id="stmp_enabled" />
-                    <span>启用弹窗式模型选择器</span>
-                </label>
-                <label class="checkbox_label" for="stmp_enable_mobile" title="移动端同样使用弹窗选择器">
-                    <input type="checkbox" id="stmp_enable_mobile" />
-                    <span>移动端也启用</span>
-                </label>
-                <label class="checkbox_label" for="stmp_takeover_select2" title="OpenRouter / Chutes / NanoGPT 等下拉原生已带搜索，默认保持原样">
-                    <input type="checkbox" id="stmp_takeover_select2" />
-                    <span>接管已带搜索的下拉（OpenRouter 等）</span>
-                </label>
+            <div class="inline-drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>一、模型选择器</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content">
+                    <div class="flex-container flexFlowColumn">
+                        <label class="checkbox_label" for="stmp_enabled" title="关闭后恢复成 SillyTavern 原生下拉">
+                            <input type="checkbox" id="stmp_enabled" />
+                            <span>启用弹窗式模型选择器</span>
+                        </label>
+                        <label class="checkbox_label" for="stmp_enable_mobile" title="移动端同样使用弹窗选择器">
+                            <input type="checkbox" id="stmp_enable_mobile" />
+                            <span>移动端也启用</span>
+                        </label>
+                        <label class="checkbox_label" for="stmp_takeover_select2" title="OpenRouter / Chutes / NanoGPT 等下拉原生已带搜索，默认保持原样">
+                            <input type="checkbox" id="stmp_takeover_select2" />
+                            <span>接管已带搜索的下拉（OpenRouter 等）</span>
+                        </label>
+                    </div>
+                    <div class="stmp_targets_toolbar">
+                        <span class="stmp_subtitle">接管的模型下拉</span>
+                        <span>
+                            <button class="stmp_btn menu_button" id="stmp_targets_all">全选</button>
+                            <button class="stmp_btn menu_button" id="stmp_targets_none">全不选</button>
+                        </span>
+                    </div>
+                    <div id="stmp_targets" class="stmp_targets"></div>
+                </div>
             </div>
-            <div class="stmp_targets_toolbar">
-                <span class="stmp_subtitle">接管的模型下拉</span>
-                <span>
-                    <button class="stmp_btn menu_button" id="stmp_targets_all">全选</button>
-                    <button class="stmp_btn menu_button" id="stmp_targets_none">全不选</button>
-                </span>
+
+            <div class="inline-drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>二、聊天文件增强</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content">
+                    <div class="flex-container flexFlowColumn">
+                        <label class="checkbox_label" for="stcfp_enabled" title="关闭后完全恢复 SillyTavern 原生行为">
+                            <input type="checkbox" id="stcfp_enabled" />
+                            <span>启用聊天文件增强</span>
+                        </label>
+                        <label class="checkbox_label" for="stcfp_fast_open" title="点击「管理聊天文件」立即弹出弹窗，列表加载时显示骨架屏">
+                            <input type="checkbox" id="stcfp_fast_open" />
+                            <span>管理聊天文件弹窗秒开</span>
+                        </label>
+                        <label class="checkbox_label" for="stcfp_copy_button" title="在删除按钮旁加一个复制按钮，生成聊天文件的完整副本">
+                            <input type="checkbox" id="stcfp_copy_button" />
+                            <span>启用聊天文件复制按钮</span>
+                        </label>
+                    </div>
+                </div>
             </div>
-            <div id="stmp_targets" class="stmp_targets"></div>
         </div>
     </div>
 </div>

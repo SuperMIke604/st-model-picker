@@ -1,0 +1,49 @@
+/** 扩展共享工具 */
+
+/** 核心语言包里没有的文案，走这里的中英对照 */
+const EXTRA_ZH = {
+    // 模型选择器
+    'No matching models': '没有匹配的模型',
+    'This source has no models yet. Connect it first and try again.': '该来源还没有模型列表，请先点击 Connect 连接后再选择。',
+    'Type to search, Enter to select.': '输入关键词搜索，回车选中，Esc 关闭。',
+    // 聊天文件增强
+    'Loading chat files...': '正在加载聊天文件……',
+    'Copy chat file': '复制聊天文件',
+    'Copying chat file...': '正在复制聊天文件……',
+    'Copied to': '已复制为',
+    'Copy failed': '复制失败',
+};
+
+/** 获取 SillyTavern 扩展上下文 */
+export function getContext() {
+    return globalThis.SillyTavern?.getContext?.() ?? null;
+}
+
+/**
+ * 翻译：优先核心语言包（zh-cn 已内置「搜索模型……」「选择模型」「取消」），其余走内置对照表
+ * @param {string} text 原英文文案
+ * @returns {string} 翻译后的文案
+ */
+export function T(text) {
+    const context = getContext();
+    const locale = String(context?.getCurrentLocale?.() ?? '');
+    if (locale.toLowerCase().startsWith('zh') && EXTRA_ZH[text]) {
+        return EXTRA_ZH[text];
+    }
+    return context?.translate?.(text) ?? text;
+}
+
+/** 异步 POST JSON，返回解析后的响应 */
+export async function postJson(url, body) {
+    const { getRequestHeaders } = await import('../../../../script.js');
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: getRequestHeaders(),
+        body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+        throw new Error(`${url} -> HTTP ${response.status}`);
+    }
+    const contentType = response.headers.get('content-type') ?? '';
+    return contentType.includes('json') ? response.json() : response.text();
+}

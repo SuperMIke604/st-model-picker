@@ -1,5 +1,8 @@
-/* Model Picker（模型选择器）样式
-   —— 全部使用 SillyTavern 主题变量，跟随亮/暗主题 */
+/* ST Tools（酒馆增强套件）样式
+   全部使用 SillyTavern 主题变量，跟随亮/暗主题
+
+   一、模型选择器 .stmp_*
+   二、聊天文件增强 .stcfp_* / .copyChatButton */
 
 /* 被接管的原生下拉：保留在 DOM 中（核心逻辑仍靠它），只是不再显示 */
 .stmp_native_select {
@@ -153,7 +156,7 @@
 
 /* ---------- 设置面板 ---------- */
 
-.st-model-picker-settings .stmp_targets {
+.st-tools-settings .stmp_targets {
     display: flex;
     flex-direction: column;
     max-height: 260px;
@@ -161,11 +164,11 @@
     margin-top: 8px;
 }
 
-.st-model-picker-settings .stmp_target_label {
+.st-tools-settings .stmp_target_label {
     margin: 2px 0;
 }
 
-.st-model-picker-settings .stmp_targets_toolbar {
+.st-tools-settings .stmp_targets_toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -173,11 +176,11 @@
     margin-top: 10px;
 }
 
-.st-model-picker-settings .stmp_subtitle {
+.st-tools-settings .stmp_subtitle {
     font-weight: 600;
 }
 
-.st-model-picker-settings .stmp_btn {
+.st-tools-settings .stmp_btn {
     padding: 3px 8px;
     margin-left: 4px;
 }
@@ -190,5 +193,78 @@
 
     .stmp_item {
         padding: 10px;
+    }
+}
+/* Chat Files Plus（聊天文件增强）样式
+   全部使用 SillyTavern 主题变量，跟随亮/暗主题 */
+
+/* ---------- 骨架屏（秒开过渡） ---------- */
+
+.stcfp_loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 18px 8px;
+    opacity: 0.8;
+    font-size: 0.95rem;
+}
+
+.stcfp_skeleton_block {
+    height: 72px;
+    margin: 8px 0;
+    border-radius: 8px;
+    background: linear-gradient(
+        100deg,
+        var(--black30a) 40%,
+        var(--grey30, rgba(128, 128, 128, 0.2)) 50%,
+        var(--black30a) 60%
+    );
+    background-size: 200% 100%;
+    animation: stcfp-shimmer 1.4s ease-in-out infinite;
+}
+
+.stcfp_skeleton_block.stcfp_w60 {
+    width: 60%;
+}
+
+.stcfp_skeleton_block.stcfp_w80 {
+    width: 80%;
+}
+
+@keyframes stcfp-shimmer {
+    0% {
+        background-position: 120% 0;
+    }
+
+    100% {
+        background-position: -80% 0;
+    }
+}
+
+/* ---------- 复制按钮 ---------- */
+
+#select_chat_div .copyChatButton {
+    cursor: pointer;
+}
+
+#select_chat_div .copyChatButton:hover {
+    opacity: 1 !important;
+}
+
+/* 复制进行中 */
+#select_chat_div .copyChatButton.stcfp_busy {
+    pointer-events: none;
+    animation: stcfp-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes stcfp-pulse {
+    0%,
+    100% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 1;
     }
 }

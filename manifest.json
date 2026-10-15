@@ -1,9 +1,9 @@
 {
-    "display_name": "Model Picker（模型选择器）",
+    "display_name": "ST Tools（模型选择器 + 聊天文件增强）",
     "name": "st-model-picker",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "author": "Mike",
-    "description": "把模型下拉框换成「点击弹窗 + 可搜索」的选择器，PC 与移动端通用",
+    "description": "酒馆增强套件：① 模型下拉换成可搜索的弹窗选择器（PC/移动端）；② 管理聊天文件秒开 + 一键复制聊天文件",
     "js": "index.js",
     "css": "style.css",
     "type": "extension",
