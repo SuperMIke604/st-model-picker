@@ -1,0 +1,32 @@
+<div class="st-model-picker-settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>Model Picker（模型选择器）</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            <div class="flex-container flexFlowColumn">
+                <label class="checkbox_label" for="stmp_enabled" title="关闭后恢复成 SillyTavern 原生下拉">
+                    <input type="checkbox" id="stmp_enabled" />
+                    <span>启用弹窗式模型选择器</span>
+                </label>
+                <label class="checkbox_label" for="stmp_enable_mobile" title="移动端同样使用弹窗选择器">
+                    <input type="checkbox" id="stmp_enable_mobile" />
+                    <span>移动端也启用</span>
+                </label>
+                <label class="checkbox_label" for="stmp_takeover_select2" title="OpenRouter / Chutes / NanoGPT 等下拉原生已带搜索，默认保持原样">
+                    <input type="checkbox" id="stmp_takeover_select2" />
+                    <span>接管已带搜索的下拉（OpenRouter 等）</span>
+                </label>
+            </div>
+            <div class="stmp_targets_toolbar">
+                <span class="stmp_subtitle">接管的模型下拉</span>
+                <span>
+                    <button class="stmp_btn menu_button" id="stmp_targets_all">全选</button>
+                    <button class="stmp_btn menu_button" id="stmp_targets_none">全不选</button>
+                </span>
+            </div>
+            <div id="stmp_targets" class="stmp_targets"></div>
+        </div>
+    </div>
+</div>

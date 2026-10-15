@@ -1,0 +1,194 @@
+/* Model Picker（模型选择器）样式
+   —— 全部使用 SillyTavern 主题变量，跟随亮/暗主题 */
+
+/* 被接管的原生下拉：保留在 DOM 中（核心逻辑仍靠它），只是不再显示 */
+.stmp_native_select {
+    display: none !important;
+}
+
+/* 触发器：外观对齐 .text_pole（背景用 --black30a，文字色用 --SmartThemeBodyColor） */
+.stmp_trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    min-height: 30px;
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 5px;
+    background-color: var(--black30a);
+    color: var(--SmartThemeBodyColor);
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stmp_trigger .stmp_value {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--SmartThemeBodyColor);
+}
+
+.stmp_trigger .stmp_icon {
+    flex: 0 0 auto;
+    opacity: 0.7;
+    color: var(--SmartThemeBodyColor);
+}
+
+.stmp_trigger:hover,
+.stmp_trigger:focus-visible {
+    border-color: var(--SmartThemeEmColor, var(--SmartThemeBorderColor));
+    outline: none;
+}
+
+.stmp_trigger:focus-visible {
+    box-shadow: 0 0 0 2px var(--SmartThemeShadowColor);
+}
+
+/* ---------- 弹窗 ---------- */
+
+.stmp_popup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.stmp_popup .stmp_title {
+    margin: 0;
+    flex: 0 0 auto;
+}
+
+.stmp_search_wrap {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.stmp_search_wrap .stmp_search_icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.6;
+    pointer-events: none;
+    font-size: 14px;
+}
+
+.stmp_popup .stmp_search {
+    width: 100%;
+    padding-left: 30px !important;
+    box-sizing: border-box;
+}
+
+.stmp_list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    max-height: min(55vh, 420px);
+    margin: 0 -4px;
+    padding: 0 4px;
+}
+
+.stmp_group_label {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 6px 6px 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--SmartThemeBodyColor);
+    background-color: var(--SmartThemeBlurTintColor);
+    border-bottom: 1px solid var(--SmartThemeBorderColor);
+}
+
+.stmp_item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    word-break: break-all;
+}
+
+.stmp_item:hover {
+    background-color: var(--black30a);
+}
+
+.stmp_item.stmp_active {
+    background-color: var(--black30a);
+    outline: 1px solid var(--SmartThemeBorderColor);
+}
+
+.stmp_item.stmp_selected {
+    font-weight: 600;
+    opacity: 1;
+}
+
+.stmp_item_text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.stmp_item_check {
+    flex: 0 0 auto;
+    opacity: 0.9;
+}
+
+.stmp_empty,
+.stmp_hint,
+.stmp_footer {
+    padding: 8px 4px;
+    font-size: 12px;
+    opacity: 0.75;
+    text-align: center;
+}
+
+/* ---------- 设置面板 ---------- */
+
+.st-model-picker-settings .stmp_targets {
+    display: flex;
+    flex-direction: column;
+    max-height: 260px;
+    overflow-y: auto;
+    margin-top: 8px;
+}
+
+.st-model-picker-settings .stmp_target_label {
+    margin: 2px 0;
+}
+
+.st-model-picker-settings .stmp_targets_toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.st-model-picker-settings .stmp_subtitle {
+    font-weight: 600;
+}
+
+.st-model-picker-settings .stmp_btn {
+    padding: 3px 8px;
+    margin-left: 4px;
+}
+
+/* 移动端：弹窗列表占更多高度，触控目标更大 */
+@media screen and (max-width: 768px) {
+    .stmp_list {
+        max-height: 60vh;
+    }
+
+    .stmp_item {
+        padding: 10px;
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "display_name": "Model Picker（模型选择器）",
+    "name": "st-model-picker",
+    "version": "1.0.0",
+    "author": "Mike",
+    "description": "把模型下拉框换成「点击弹窗 + 可搜索」的选择器，PC 与移动端通用",
+    "js": "index.js",
+    "css": "style.css",
+    "type": "extension",
+    "loading_order": 1000,
+    "requires": [],
+    "optional": [],
+    "homePage": ""
+}
