@@ -77,10 +77,15 @@
                     </div>
                     <div class="flex-container alignitemscenter flexGap10 marginTop10">
                         <label for="stcv_mode">渲染模式</label>
-                        <select id="stcv_mode" class="text_pole" style="width: 220px;">
+                        <select id="stcv_mode" class="text_pole" style="width: 240px;">
+                            <option value="paged">分页阅读（一页一页读，底部翻页条）</option>
                             <option value="virtual">虚拟化（滚动条覆盖全部楼层）</option>
                             <option value="window">窗口（只渲染最新若干楼）</option>
                         </select>
+                    </div>
+                    <div class="flex-container alignitemscenter flexGap10 marginTop5">
+                        <label for="stcv_page">每页楼层数</label>
+                        <input type="number" id="stcv_page" class="text_pole" min="1" max="500" step="1" style="width: 90px;">
                     </div>
                     <div class="flex-container alignitemscenter flexGap10 marginTop5">
                         <label for="stcv_window">每次加载楼层数</label>
@@ -90,7 +95,7 @@
                         <label for="stcv_max">DOM 最多保留消息数</label>
                         <input type="number" id="stcv_max" class="text_pole" min="10" max="500" step="10" style="width: 90px;">
                     </div>
-                    <small class="opacity70p">虚拟化模式：用上下留白撑出完整滚动条，可直接拖到任意楼层，DOM 只保留视口附近几条；未量过的楼层先用估算高度，进入视口后实测校正。<br>窗口模式：只渲染最新若干楼，下滑续载、向上按段加载，滚动条长度等于当前窗口。</small>
+                    <small class="opacity70p">分页阅读：像起点网页版那样按固定楼数切页，一次只渲染一页，底部常驻「上一页 / 页码 / 下一页 / 最新」翻页条，页内正常滚动。跳转永远精确落在目标楼，不存在估算漂移。「每页楼层数」对这种模式生效。<br>虚拟化模式：用上下留白撑出完整滚动条，可直接拖到任意楼层，DOM 只保留视口附近几条；未量过的楼层先用估算高度，进入视口后实测校正。<br>窗口模式：只渲染最新若干楼，下滑续载、向上按段加载，滚动条长度等于当前窗口。「每次加载楼层数」只对窗口模式生效。</small>
                 </div>
             </div>
         </div>

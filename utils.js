@@ -19,6 +19,11 @@ const EXTRA_ZH = {
     'Chat chapters': '聊天目录',
     'Load earlier messages': '加载更早的消息',
     'Close': '关闭',
+    // 分页阅读
+    'Previous page': '上一页',
+    'Next page': '下一页',
+    'Page {0} / {1}': '第 {0} / {1} 页',
+    'messages': '楼',
 };
 
 /** 获取 SillyTavern 扩展上下文 */
@@ -27,17 +32,26 @@ export function getContext() {
 }
 
 /**
- * 翻译：优先核心语言包（zh-cn 已内置「搜索模型……」「选择模型」「取消」），其余走内置对照表
+ * 翻译：优先核心语言包（zh-cn 已内置「搜索模型……」「选择模型」「取消」），其余走内置对照表。
+ * 文案里的 {0} {1} 会按顺序替换成 args，用来处理中英文语序不同的句子。
+ *
  * @param {string} text 原英文文案
+ * @param {...any} args 占位符参数
  * @returns {string} 翻译后的文案
  */
-export function T(text) {
+export function T(text, ...args) {
     const context = getContext();
     const locale = String(context?.getCurrentLocale?.() ?? '');
+    let out = text;
     if (locale.toLowerCase().startsWith('zh') && EXTRA_ZH[text]) {
-        return EXTRA_ZH[text];
+        out = EXTRA_ZH[text];
+    } else {
+        out = context?.translate?.(text) ?? text;
     }
-    return context?.translate?.(text) ?? text;
+    args.forEach((value, i) => {
+        out = out.split(`{${i}}`).join(String(value));
+    });
+    return out;
 }
 
 /** 异步 POST JSON，返回解析后的响应 */

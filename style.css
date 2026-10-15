@@ -387,6 +387,72 @@
     text-align: center;
 }
 
+/* ---------- 分页阅读：底部翻页条 ----------
+   放在 #chat 之后（不是里面），否则会随聊天内容一起滚走 */
+
+.stcv_pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 6px;
+    flex: 0 0 auto;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    font-size: 13px;
+    line-height: 1.4;
+    border-top: 1px solid var(--SmartThemeBorderColor);
+    background-color: var(--SmartThemeBlurTintColor);
+}
+
+.stcv_pager .stcv_page_btn {
+    margin: 0;
+    padding: 2px 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    width: fit-content;
+}
+
+/* 首页/末页时对应按钮置灰，仍占位，避免翻页条宽度跳动 */
+.stcv_pager .stcv_page_btn.stcv_disabled {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.stcv_pager .stcv_page_info {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 2px;
+    font-size: 12px;
+    opacity: 0.85;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 窄屏放不下四块内容，让页码单独占一行，三个按钮留在下面 */
+@media screen and (max-width: 768px) {
+    .stcv_pager {
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 4px 6px;
+    }
+
+    .stcv_pager .stcv_page_btn {
+        padding: 5px 12px;
+    }
+
+    .stcv_pager .stcv_page_info {
+        flex: 1 0 100%;
+        order: -1;
+        font-size: 12px;
+    }
+}
+
 @media screen and (max-width: 768px) {
     .stcv_list {
         max-height: 60vh;

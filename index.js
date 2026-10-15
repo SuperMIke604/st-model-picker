@@ -56,15 +56,17 @@ function bindToggles() {
             onChanged();
         });
     };
+    bindNumber('stcv_page', () => settings.chatView.pageSize, v => settings.chatView.pageSize = v, applyChatView);
     bindNumber('stcv_window', () => settings.chatView.windowSize, v => settings.chatView.windowSize = v, applyChatView);
     bindNumber('stcv_max', () => settings.chatView.maxMessages, v => settings.chatView.maxMessages = v, applyChatView);
 
-    // 渲染模式：虚拟化 / 窗口
+    // 渲染模式：分页 / 虚拟化 / 窗口
     const modeSelect = document.getElementById('stcv_mode');
     if (modeSelect) {
-        modeSelect.value = settings.chatView.mode === 'window' ? 'window' : 'virtual';
+        const normalize = v => (v === 'window' || v === 'virtual' ? v : 'paged');
+        modeSelect.value = normalize(settings.chatView.mode);
         modeSelect.addEventListener('change', () => {
-            settings.chatView.mode = modeSelect.value === 'window' ? 'window' : 'virtual';
+            settings.chatView.mode = normalize(modeSelect.value);
             context.saveSettingsDebounced();
             applyChatView();
         });

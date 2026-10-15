@@ -22,6 +22,7 @@ import { applyStylePins } from '../../../power-user.js';
 import { settings } from './settings.js';
 import { T, getContext } from './utils.js';
 import { scrollToIndex, scrollToLatest, applyChatVirtual, teardownVirtual } from './chat-virtual.js';
+import { applyChatPaged, teardownPaged, pagerApi } from './chat-pager.js';
 
 const SHOW_MORE_ID = 'stcv_show_more';
 
@@ -32,10 +33,11 @@ const view = () => settings.chatView;
 
 /**
  * 窗口模式专属逻辑的开关。
- * 目录菜单与弹窗两种模式共用，但裁剪/分段加载只在 window 模式生效 ——
- * virtual 模式由 chat-virtual.js 接管渲染，两边同时裁剪会互相打架。
+ * 目录菜单与弹窗三种模式共用，但裁剪/分段加载只在 window 模式生效 ——
+ * paged 模式由 chat-pager.js 接管渲染、virtual 模式由 chat-virtual.js 接管，
+ * 两边同时裁剪会互相打架。
  */
-const windowMode = () => view().enabled && view().mode !== 'virtual';
+const windowMode = () => view().enabled && view().mode === 'window';
 
 /* ------------------------------------------------------------------ *
  * 窗口信息
@@ -165,19 +167,27 @@ async function renderWindow(startId, { scroll = 'top' } = {}) {
     }
 }
 
-/** 回到最新并滚到底部 */
+/** 回到最新并滚到底部。三种模式各走各的实现 */
 async function jumpToLatest() {
     if (view().mode === 'virtual') {
         await scrollToLatest();
         return;
     }
+    if (view().mode === 'paged') {
+        await pagerApi.goLatest();
+        return;
+    }
     await renderWindow(Math.max(0, chat.length - view().windowSize), { scroll: 'bottom' });
 }
 
-/** 跳到第 start 楼。两种模式各走各的实现 */
+/** 跳到第 start 楼。三种模式各走各的实现 */
 async function jumpTo(start) {
     if (view().mode === 'virtual') {
         await scrollToIndex(start);
+        return;
+    }
+    if (view().mode === 'paged') {
+        await pagerApi.goToIndex(start);
         return;
     }
     await renderWindow(start);
@@ -527,6 +537,7 @@ export function applyChatView() {
             chatElement.prepend('<div id="show_more_messages">Show more messages</div>');
         }
         teardownVirtual();
+        teardownPaged();
         return;
     }
 
@@ -537,12 +548,19 @@ export function applyChatView() {
     if (view().mode === 'virtual') {
         // 虚拟模式下没有「加载更早」按钮，滚动到顶自然就有更早的楼层
         chatElement.find(`#${SHOW_MORE_ID}`).remove();
+        teardownPaged();
         applyChatVirtual();
+    } else if (view().mode === 'paged') {
+        // 分页模式一页一页读，同样不需要「加载更早」
+        chatElement.find(`#${SHOW_MORE_ID}`).remove();
+        teardownVirtual();
+        applyChatPaged();
     } else {
         teardownVirtual();
+        teardownPaged();
         syncShowMoreButton();
 
-        // 从虚拟化切过来时 DOM 里只剩视口那几条，补成一个完整窗口
+        // 从其它模式切过来时 DOM 里只剩一页/视口那几条，补成一个完整窗口
         const expected = Math.min(view().windowSize, chat.length);
         if (chat.length > 0 && renderedCount() !== expected) {
             renderWindow(Math.max(0, chat.length - view().windowSize), { scroll: 'bottom' });

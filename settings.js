@@ -21,10 +21,13 @@ const DEFAULT_SETTINGS = {
         enabled: true,
         /**
          * 渲染模式：
+         * - paged：分页阅读（起点式）。按固定楼数切页，一次只渲染一页，底部常驻翻页条
          * - window：只渲染最新 N 楼，向上/向下按段加载（滚动条只有 N 楼长）
          * - virtual：虚拟化，用上下留白撑出完整滚动条，只挂载视口附近的楼层
          */
-        mode: 'virtual',
+        mode: 'paged',
+        /** paged 模式下每页多少楼 */
+        pageSize: 20,
         /** window 模式下每次加载多少楼；virtual 模式下作为初始装载量 */
         windowSize: 10,
         /** DOM 内最多保留多少条消息，超出从另一端裁掉 */
