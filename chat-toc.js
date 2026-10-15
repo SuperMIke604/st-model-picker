@@ -21,6 +21,7 @@ import { chat, chatElement, redisplayChat, updateMessageElement, refreshSwipeBut
 import { applyStylePins } from '../../../power-user.js';
 import { settings } from './settings.js';
 import { T, getContext } from './utils.js';
+import { scrollToIndex, scrollToLatest, applyChatVirtual, teardownVirtual } from './chat-virtual.js';
 
 const SHOW_MORE_ID = 'stcv_show_more';
 
@@ -28,6 +29,13 @@ let scrollTicking = false;
 let loading = false;
 
 const view = () => settings.chatView;
+
+/**
+ * 窗口模式专属逻辑的开关。
+ * 目录菜单与弹窗两种模式共用，但裁剪/分段加载只在 window 模式生效 ——
+ * virtual 模式由 chat-virtual.js 接管渲染，两边同时裁剪会互相打架。
+ */
+const windowMode = () => view().enabled && view().mode !== 'virtual';
 
 /* ------------------------------------------------------------------ *
  * 窗口信息
@@ -49,7 +57,7 @@ function renderedCount() {
 
 /** 统一顶部按钮状态：只保留我们自己的那个 */
 function syncShowMoreButton() {
-    if (!view().enabled) return;
+    if (!windowMode()) return;
 
     chatElement.find('#show_more_messages').remove();
 
@@ -115,7 +123,7 @@ function trimBottom() {
  * 核心（以及其他优化扩展）可能渲染了更多条，这里统一收到我们的窗口大小。
  */
 function trimToWindow() {
-    if (!view().enabled) return;
+    if (!windowMode()) return;
     const before = renderedCount();
     trimTop(view().windowSize);
     if (renderedCount() !== before) {
@@ -157,9 +165,22 @@ async function renderWindow(startId, { scroll = 'top' } = {}) {
     }
 }
 
-/** 回到最新窗口并滚到底部 */
+/** 回到最新并滚到底部 */
 async function jumpToLatest() {
+    if (view().mode === 'virtual') {
+        await scrollToLatest();
+        return;
+    }
     await renderWindow(Math.max(0, chat.length - view().windowSize), { scroll: 'bottom' });
+}
+
+/** 跳到第 start 楼。两种模式各走各的实现 */
+async function jumpTo(start) {
+    if (view().mode === 'virtual') {
+        await scrollToIndex(start);
+        return;
+    }
+    await renderWindow(start);
 }
 
 /** 下滑到底时继续加载后续 N 楼，直到最新 */
@@ -309,7 +330,7 @@ function openToc() {
 
     function jump(start) {
         popup.complete(POPUP_RESULT.AFFIRMATIVE);
-        renderWindow(start);
+        jumpTo(start);
     }
 
     function render() {
@@ -406,7 +427,7 @@ function onScroll() {
     scrollTicking = true;
     requestAnimationFrame(() => {
         scrollTicking = false;
-        if (!view().enabled) return;
+        if (!windowMode()) return;
         const el = chatElement[0];
         if (!el) return;
         const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 200;
@@ -430,13 +451,13 @@ function bindEvents() {
 
     // 向上加载更早楼层后，从尾部裁掉多余的，防止窗口两端同时膨胀
     eventSource?.on(eventTypes.MORE_MESSAGES_LOADED, () => {
-        if (!view().enabled) return;
+        if (!windowMode()) return;
         trimBottom();
     });
 
     // 收到新消息
     const onNewMessage = () => {
-        if (!view().enabled) return;
+        if (!windowMode()) return;
         const range = currentRange();
         if (!range) return;
 
@@ -464,7 +485,7 @@ function bindEvents() {
     // 否则后续按 mesid 的编辑/滑动/续载全部会错位
     if (eventTypes.MESSAGE_DELETED) {
         eventSource?.on(eventTypes.MESSAGE_DELETED, () => {
-            if (!view().enabled) return;
+            if (!windowMode()) return;
             const range = currentRange();
             if (!range) {
                 syncShowMoreButton();
@@ -488,7 +509,7 @@ function bindEvents() {
     // 切换/打开聊天：核心渲染完后把窗口压到 windowSize
     if (eventTypes.CHAT_CHANGED) {
         eventSource?.on(eventTypes.CHAT_CHANGED, () => {
-            if (!view().enabled) return;
+            if (!windowMode()) return;
             // 让其它扩展的渲染逻辑先跑完
             setTimeout(trimToWindow, 0);
         });
@@ -505,14 +526,30 @@ export function applyChatView() {
         if (range && range[0] > 0 && chatElement.find('#show_more_messages').length === 0) {
             chatElement.prepend('<div id="show_more_messages">Show more messages</div>');
         }
+        teardownVirtual();
         return;
     }
 
     injectMenuItem();
     watchMenu();
     bindEvents();
-    syncShowMoreButton();
-    trimToWindow();
+
+    if (view().mode === 'virtual') {
+        // 虚拟模式下没有「加载更早」按钮，滚动到顶自然就有更早的楼层
+        chatElement.find(`#${SHOW_MORE_ID}`).remove();
+        applyChatVirtual();
+    } else {
+        teardownVirtual();
+        syncShowMoreButton();
+
+        // 从虚拟化切过来时 DOM 里只剩视口那几条，补成一个完整窗口
+        const expected = Math.min(view().windowSize, chat.length);
+        if (chat.length > 0 && renderedCount() !== expected) {
+            renderWindow(Math.max(0, chat.length - view().windowSize), { scroll: 'bottom' });
+        } else {
+            trimToWindow();
+        }
+    }
 }
 
 /** 初始化聊天视图与目录 */

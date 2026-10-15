@@ -271,6 +271,16 @@
 
 /* ---------- 三、聊天视图与目录 ---------- */
 
+/* 虚拟化：撑出未挂载楼层的高度。
+   必须是 flex item（#chat 是 flex 容器），不能用 #chat 的 padding ——
+   padding 会把容器自身撑大，clientHeight 会从 399 变成十万级，视口高度彻底失真 */
+.stvv_spacer {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 0;
+    pointer-events: none;
+}
+
 /* 顶部「加载更早的消息」：与核心 #show_more_messages 同一观感 */
 #stcv_show_more {
     text-align: center;

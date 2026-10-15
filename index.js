@@ -59,6 +59,17 @@ function bindToggles() {
     bindNumber('stcv_window', () => settings.chatView.windowSize, v => settings.chatView.windowSize = v, applyChatView);
     bindNumber('stcv_max', () => settings.chatView.maxMessages, v => settings.chatView.maxMessages = v, applyChatView);
 
+    // 渲染模式：虚拟化 / 窗口
+    const modeSelect = document.getElementById('stcv_mode');
+    if (modeSelect) {
+        modeSelect.value = settings.chatView.mode === 'window' ? 'window' : 'virtual';
+        modeSelect.addEventListener('change', () => {
+            settings.chatView.mode = modeSelect.value === 'window' ? 'window' : 'virtual';
+            context.saveSettingsDebounced();
+            applyChatView();
+        });
+    }
+
     // 目标下拉的全选 / 全不选
     document.getElementById('stmp_targets_all')?.addEventListener('click', () => {
         settings.modelPicker.disabledTargets = [];

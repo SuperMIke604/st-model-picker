@@ -66,16 +66,23 @@
                 </div>
                 <div class="inline-drawer-content">
                     <div class="flex-container flexFlowColumn">
-                        <label class="checkbox_label" for="stcv_enabled" title="打开聊天只渲染最新若干楼，并在魔法棒菜单加入「聊天目录」">
+                        <label class="checkbox_label" for="stcv_enabled" title="只渲染视口附近的楼层，并在魔法棒菜单加入「聊天目录」">
                             <input type="checkbox" id="stcv_enabled" />
-                            <span>启用窗口化渲染 + 聊天目录</span>
+                            <span>启用聊天视图优化 + 聊天目录</span>
                         </label>
-                        <label class="checkbox_label" for="stcv_auto_jump" title="停在旧楼层时收到新回复，自动回到最新窗口">
+                        <label class="checkbox_label" for="stcv_auto_jump" title="停在旧楼层时收到新回复，自动回到最新">
                             <input type="checkbox" id="stcv_auto_jump" />
                             <span>收到新消息自动跳回最新</span>
                         </label>
                     </div>
                     <div class="flex-container alignitemscenter flexGap10 marginTop10">
+                        <label for="stcv_mode">渲染模式</label>
+                        <select id="stcv_mode" class="text_pole" style="width: 220px;">
+                            <option value="virtual">虚拟化（滚动条覆盖全部楼层）</option>
+                            <option value="window">窗口（只渲染最新若干楼）</option>
+                        </select>
+                    </div>
+                    <div class="flex-container alignitemscenter flexGap10 marginTop5">
                         <label for="stcv_window">每次加载楼层数</label>
                         <input type="number" id="stcv_window" class="text_pole" min="1" max="1000" step="1" style="width: 90px;">
                     </div>
@@ -83,7 +90,7 @@
                         <label for="stcv_max">DOM 最多保留消息数</label>
                         <input type="number" id="stcv_max" class="text_pole" min="10" max="500" step="10" style="width: 90px;">
                     </div>
-                    <small class="opacity70p">下滑会自动续载后续楼层直至最新；超出上限会从另一端裁剪，DOM 规模始终保持恒定。</small>
+                    <small class="opacity70p">虚拟化模式：用上下留白撑出完整滚动条，可直接拖到任意楼层，DOM 只保留视口附近几条；未量过的楼层先用估算高度，进入视口后实测校正。<br>窗口模式：只渲染最新若干楼，下滑续载、向上按段加载，滚动条长度等于当前窗口。</small>
                 </div>
             </div>
         </div>
