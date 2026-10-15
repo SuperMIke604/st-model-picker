@@ -3,12 +3,10 @@ import { extension_settings } from '../../../extensions.js';
 export const MODULE_NAME = 'st-model-picker';
 
 const DEFAULT_SETTINGS = {
-    /** 功能一：模型选择器 */
+    /** 功能一：模型选择器（全部模型下拉无差别接管） */
     modelPicker: {
         enabled: true,
         enableMobile: true,
-        /** 不想被接管的下拉 id（select[id^="model_"][id$="_select"]） */
-        disabledTargets: [],
     },
     /** 功能二：聊天文件增强 */
     chatFiles: {
@@ -46,7 +44,6 @@ function migrate(raw) {
         modelPicker: {
             enabled: raw.enabled,
             enableMobile: raw.enableMobile,
-            disabledTargets: raw.disabledTargets ?? [],
         },
     };
 }
@@ -59,12 +56,9 @@ export const settings = {
     chatView: Object.assign({}, DEFAULT_SETTINGS.chatView, stored?.chatView ?? {}),
 };
 
-settings.modelPicker.disabledTargets = Array.isArray(settings.modelPicker.disabledTargets)
-    ? settings.modelPicker.disabledTargets
-    : [];
-
-// 旧版本留下的已废弃字段（多渲染模式 / 是否接管 select2），读到了就丢掉，避免脏数据被回写
+// 旧版本留下的已废弃字段（排除列表 / 多渲染模式 / 是否接管 select2），读到了就丢掉，避免脏数据被回写
 delete settings.modelPicker.takeoverSelect2;
+delete settings.modelPicker.disabledTargets;
 delete settings.chatView.mode;
 delete settings.chatView.windowSize;
 delete settings.chatView.maxMessages;

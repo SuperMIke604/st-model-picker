@@ -8,7 +8,7 @@
 
 import { settings } from './settings.js';
 import { getContext } from './utils.js';
-import { initModelPicker, applyModelPicker, renderTargetList } from './model-picker.js';
+import { initModelPicker, applyModelPicker } from './model-picker.js';
 import { initChatFiles, applyChatFiles } from './chat-files.js';
 import { initChatView, applyChatView } from './chat-toc.js';
 
@@ -56,20 +56,6 @@ function bindToggles() {
         });
     };
     bindNumber('stcv_page', () => settings.chatView.pageSize, v => settings.chatView.pageSize = v, applyChatView);
-
-    // 目标下拉的全选 / 全不选
-    document.getElementById('stmp_targets_all')?.addEventListener('click', () => {
-        settings.modelPicker.disabledTargets = [];
-        context.saveSettingsDebounced();
-        renderTargetList();
-        applyModelPicker();
-    });
-    document.getElementById('stmp_targets_none')?.addEventListener('click', () => {
-        settings.modelPicker.disabledTargets = Array.from(document.querySelectorAll('select[id^="model_"][id$="_select"]')).map(x => x.id);
-        context.saveSettingsDebounced();
-        renderTargetList();
-        applyModelPicker();
-    });
 }
 
 async function loadSettingsUi() {
@@ -77,7 +63,6 @@ async function loadSettingsUi() {
     const html = await context.renderExtensionTemplateAsync('third-party/st-model-picker', 'settings');
     document.getElementById('extensions_settings')?.insertAdjacentHTML('beforeend', html);
     bindToggles();
-    renderTargetList();
 }
 
 (async function init() {

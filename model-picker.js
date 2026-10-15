@@ -270,46 +270,12 @@ function isPlatformEnabled() {
 /** 应用模型选择器设置（可反复调用） */
 export function applyModelPicker() {
     getTargets().forEach(select => {
-        const wanted = settings.modelPicker.enabled
-            && isPlatformEnabled()
-            && !settings.modelPicker.disabledTargets.includes(select.id);
+        const wanted = settings.modelPicker.enabled && isPlatformEnabled();
         if (wanted) {
             attach(select);
         } else {
             detach(select);
         }
-    });
-}
-
-/** 渲染设置面板里的「接管的模型下拉」列表 */
-export function renderTargetList() {
-    const $container = $('#stmp_targets');
-    if (!$container.length) return;
-
-    const context = getContext();
-    $container.empty();
-
-    getTargets().forEach(select => {
-        const inputId = `stmp_target_${select.id}`;
-        const $label = $('<label class="checkbox_label stmp_target_label"></label>').attr('for', inputId);
-        const $input = $('<input>', {
-            type: 'checkbox',
-            id: inputId,
-            checked: !settings.modelPicker.disabledTargets.includes(select.id),
-        });
-        $input.on('change', () => {
-            const list = new Set(settings.modelPicker.disabledTargets);
-            if ($input.prop('checked')) {
-                list.delete(select.id);
-            } else {
-                list.add(select.id);
-            }
-            settings.modelPicker.disabledTargets = Array.from(list);
-            context.saveSettingsDebounced();
-            applyModelPicker();
-        });
-        $label.append($input, $('<span></span>').text(`${getProviderLabel(select)} (${select.id})`));
-        $container.append($label);
     });
 }
 

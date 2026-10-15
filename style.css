@@ -156,35 +156,6 @@
 
 /* ---------- 设置面板 ---------- */
 
-.st-tools-settings .stmp_targets {
-    display: flex;
-    flex-direction: column;
-    max-height: 260px;
-    overflow-y: auto;
-    margin-top: 8px;
-}
-
-.st-tools-settings .stmp_target_label {
-    margin: 2px 0;
-}
-
-.st-tools-settings .stmp_targets_toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.st-tools-settings .stmp_subtitle {
-    font-weight: 600;
-}
-
-.st-tools-settings .stmp_btn {
-    padding: 3px 8px;
-    margin-left: 4px;
-}
-
 /* 移动端：弹窗列表占更多高度，触控目标更大 */
 @media screen and (max-width: 768px) {
     .stmp_list {

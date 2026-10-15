@@ -1,7 +1,7 @@
 {
     "display_name": "ST Tools（模型选择器 + 聊天文件增强 + 聊天视图优化）",
     "name": "st-model-picker",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "author": "Mike",
     "description": "酒馆增强套件：① 全部模型下拉换成可搜索的弹窗选择器（PC/移动端）；② 管理聊天文件秒开 + 一键复制聊天文件；③ 超长聊天分页阅读（一页一页读，底部翻页条）+ 聊天目录跳转",
     "js": "index.js",
