@@ -54,7 +54,7 @@
                 </div>
                 <div class="inline-drawer-content">
                     <div class="flex-container flexFlowColumn">
-                        <label class="checkbox_label" for="stcv_enabled" title="按固定楼数分页渲染，底部翻页条上带「聊天目录」入口">
+                        <label class="checkbox_label" for="stcv_enabled" title="按固定楼数分页渲染，翻页条默认隐藏，由魔法棒菜单里的开关项唤出">
                             <input type="checkbox" id="stcv_enabled" />
                             <span>启用分页阅读 + 聊天目录</span>
                         </label>
@@ -67,7 +67,7 @@
                         <label for="stcv_page">每页楼层数</label>
                         <input type="number" id="stcv_page" class="text_pole" min="1" max="500" step="1" style="width: 90px;">
                     </div>
-                    <small class="opacity70p">像起点中文网网页版那样按固定楼数切页，一次只渲染一页，页内正常滚动。底部常驻「目录 / 上一页 / 页码 / 下一页 / 最新」翻页条，点「目录」弹出聊天目录（章节 = 用户发言楼层 + 其回复楼层），可搜索后直接跳到该页。<br>跳转是整页替换，永远精确落在目标楼，不存在估算漂移；DOM 里始终只有一页，所以 800 楼和 8000 楼的打开速度、删除速度完全一样。</small>
+                    <small class="opacity70p">像起点中文网网页版那样按固定楼数切页，一次只渲染一页，页内正常滚动。<b>翻页条默认隐藏</b>（不占任何高度），入口在底部栏的<b>魔法棒菜单</b>：「魔法棒 → 显示翻页条」唤出，「隐藏翻页条」收起，显隐状态会记住；翻页条上的「目录」按钮弹出聊天目录（章节 = 用户发言楼层 + 其回复楼层），可搜索后直接跳到该页。<br>第 0 楼（角色开场白 / 系统首条）额外附在第一页顶部、不占每页名额：每页 20 楼时，第一页是 0–20，第二页是 21–40，以此类推。<br>跳转是整页替换，永远精确落在目标楼，不存在估算漂移；DOM 里始终只有一页，所以 800 楼和 8000 楼的打开速度、删除速度完全一样。</small>
                 </div>
             </div>
         </div>

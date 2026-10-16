@@ -16,7 +16,8 @@ const DEFAULT_SETTINGS = {
     },
     /**
      * 功能三：聊天视图（分页阅读）+ 目录跳转
-     * 只有一种模式：按固定楼数切页，一次只渲染一页，底部常驻翻页条。
+     * 只有一种模式：按固定楼数切页，一次只渲染一页。
+     * 翻页条默认隐藏（不占布局高度），由魔法棒菜单里的开关项唤出。
      */
     chatView: {
         enabled: true,
@@ -24,6 +25,8 @@ const DEFAULT_SETTINGS = {
         pageSize: 20,
         /** 停在旧页时收到新回复，自动回到最新 */
         autoJumpLatest: true,
+        /** 翻页条当前是否可见（魔法棒菜单开关项的状态，跨刷新保持） */
+        pagerVisible: false,
     },
 };
 
